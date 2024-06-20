@@ -9,5 +9,4 @@ nltk
 underthesea
 wordcloud
 scikit-learn==1.2.2
-imblearn
-imbalanced-learn
+imbalanced-learn==0.12.3
