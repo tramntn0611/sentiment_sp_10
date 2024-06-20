@@ -8,3 +8,4 @@ regex
 nltk
 underthesea
 wordcloud
+imbalanced-learn==0.12.3
