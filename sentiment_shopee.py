@@ -514,7 +514,7 @@ elif  choice == 'Thông tin nhà hàng':
                 f"""
                 <div style="text-align: center;">
                     <h1>{star_rating}</h1>
-                    <h3>{rating}</h3>
+                    <h4>{rating}</h4>
                     <p><strong>{total_rat} đánh giá</strong></p>
                 </div>
                 """, 
