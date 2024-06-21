@@ -551,8 +551,8 @@ elif  choice == 'Thông tin nhà hàng':
             with rightcol2:  
                 st.markdown(
                     f"""
-                        <h4>🏷️Giá: {price}}</h4>
-                    """, 
+                        <h4>🏷️Giá: {price}</h4>
+                    """,
                     unsafe_allow_html=True
                 )
                 
