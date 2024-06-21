@@ -21,6 +21,17 @@ from nltk.tokenize import sent_tokenize
 from underthesea import word_tokenize, pos_tag, sent_tokenize
 from wordcloud import WordCloud
 from streamlit_option_menu import option_menu
+from imblearn.over_sampling import SMOTE
+from imblearn.under_sampling import RandomUnderSampler
+from sklearn.model_selection import train_test_split, cross_validate
+from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
+from sklearn.metrics import classification_report, confusion_matrix, ConfusionMatrixDisplay
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.svm import SVC
+from sklearn.naive_bayes import MultinomialNB
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.linear_model import LogisticRegression
 
 nltk.download('punkt')
 
