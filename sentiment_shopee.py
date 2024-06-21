@@ -508,13 +508,13 @@ elif  choice == 'Thông tin nhà hàng':
                 unsafe_allow_html=True
             )
 
-            leftcol1, rightcol1 = st.columns([1, 2])
+            leftcol1, rightcol1 = st.columns(2)
             with leftcol1:  
                 st.markdown(
                 f"""
                 <div style="text-align: center;">
                     <h1>{star_rating}</h1>
-                    <h1>{rating}</h1>
+                    <h3>{rating}</h3>
                     <p><strong>{total_rat} đánh giá</strong></p>
                 </div>
                 """, 
