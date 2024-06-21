@@ -542,7 +542,12 @@ elif  choice == 'Thông tin nhà hàng':
 
             leftcol2, rightcol2 = st.columns([1.2, 1])
             with leftcol2:  
-                st.markdown(f"**🗺️Giờ hoạt động: {time}**")
+                st.markdown(
+                    f"""
+                        <h4>🗺️Giờ hoạt động: {time}</h4>
+                    """, 
+                    unsafe_allow_html=True
+                )
             with rightcol2:  
                 st.subheader(f"🏷️Giá: {price}")
             
