@@ -45,7 +45,6 @@ with open('emojicon.txt', 'r', encoding="utf8") as file:
         key, value = line.split('\t')
         emoji_dict[key] = str(value)
 
-#################
 #LOAD TEENCODE
 with open('teencode.txt', 'r', encoding="utf8") as file:  
     teen_lst = file.read().split('\n')
@@ -54,7 +53,6 @@ with open('teencode.txt', 'r', encoding="utf8") as file:
         key, value = line.split('\t')
         teen_dict[key] = str(value)
 
-###############
 #LOAD TRANSLATE ENGLISH -> VNMESE
 with open('english-vnmese.txt', 'r', encoding="utf8") as file:  
     english_lst = file.read().split('\n')
@@ -63,143 +61,115 @@ with open('english-vnmese.txt', 'r', encoding="utf8") as file:
         key, value = line.split('\t')
         english_dict[key] = str(value)
 
-################
 #LOAD wrong words
 with open('wrong-word.txt', 'r', encoding="utf8") as file:  
     wrong_lst = file.read().split('\n')
 
-#################
 #LOAD STOPWORDS
 with open('vietnamese-stopwords.txt', 'r', encoding="utf8") as file:  
     stopwords_lst = file.read().split('\n')
   
 
-def process_text_str(text, emoji_dict, teen_dict, wrong_lst):
-    document = text.lower()
-    document = document.replace("’",'')
-    document = regex.sub(r'\.+', ".", document)
-    new_sentence =''
-    for sentence in sent_tokenize(document):
-        # if not(sentence.isascii()):
-        ###### CONVERT EMOJICON
-        sentence = ''.join(emoji_dict[word]+' ' if word in emoji_dict else word for word in list(sentence))
-        ###### CONVERT TEENCODE
-        sentence = ' '.join(teen_dict[word] if word in teen_dict else word for word in sentence.split())
-        ###### DEL Punctuation & Numbers
-        pattern = r'(?i)\b[a-záàảãạăắằẳẵặâấầẩẫậéèẻẽẹêếềểễệóòỏõọôốồổỗộơớờởỡợíìỉĩịúùủũụưứừửữựýỳỷỹỵđ]+\b'
-        sentence = ' '.join(re.findall(pattern,sentence))
-        # ...
-        ###### DEL wrong words
-        sentence = ' '.join('' if word in wrong_lst else word for word in sentence.split())
-        new_sentence = new_sentence+ sentence + '. '
-    document = new_sentence
-    #print(document)
-    ###### DEL excess blank space
-    document = regex.sub(r'\s+', ' ', document).strip()
-    #...
-    return document
+def process_text(text, emoji_dict, teen_dict, wrong_lst,english_dict):
+        document = text.lower()
+        document = document.replace("’",'')
+        document = re.sub(r'(\s*[!.?]+\s*)+' , ' . ', document)
+        document = re.sub(r'(\s*\,+\s*)+' , ' , ', document)
+        new_sentence =''
+        for sentence in sent_tokenize(document):
+            # if not(sentence.isascii()):
+            ###### CONVERT EMOJICON
+            sentence = ''.join(' '+emoji_dict[word]+' ' if word in emoji_dict else word for word in list(sentence))
+            ###### CONVERT TEENCODE
+            sentence = ' '.join(teen_dict[word] if word in teen_dict else word for word in sentence.split())
 
-def process_text(text, emoji_dict, teen_dict, wrong_lst):
-    if isinstance(text, float):
-        text = str(text)
-    document = text.lower()
-    document = document.replace("’",'')
-    document = regex.sub(r'\.+', ".", document)
-    new_sentence =''
-    for sentence in sent_tokenize(document):
-        # if not(sentence.isascii()):
-        ###### CONVERT EMOJICON
-        sentence = ''.join(emoji_dict[word]+' ' if word in emoji_dict else word for word in list(sentence))
-        ###### CONVERT TEENCODE
-        sentence = ' '.join(teen_dict[word] if word in teen_dict else word for word in sentence.split())
-        ###### DEL Punctuation & Numbers
-        pattern = r'(?i)\b[a-záàảãạăắằẳẵặâấầẩẫậéèẻẽẹêếềểễệóòỏõọôốồổỗộơớờởỡợíìỉĩịúùủũụưứừửữựýỳỷỹỵđ]+\b'
-        sentence = ' '.join(regex.findall(pattern,sentence))
-        # ...
-        ###### DEL wrong words
-        sentence = ' '.join('' if word in wrong_lst else word for word in sentence.split())
-        new_sentence = new_sentence+ sentence + '. '
-    document = new_sentence
-    #print(document)
-    ###### DEL excess blank space
-    document = regex.sub(r'\s+', ' ', document).strip()
-    #...
-    return document
+            ###### CONVERT eng-vnm
+            sentence = ' '.join(english_dict[word] if word in english_dict else word for word in sentence.split())
 
+            ###### DEL Punctuation & Numbers
+            pattern = r'(?i)\b[a-záàảãạăắằẳẵặâấầẩẫậéèẻẽẹêếềểễệóòỏõọôốồổỗộơớờởỡợíìỉĩịúùủũụưứừửữựýỳỷỹỵđ]+\b'#|\p{P}'
+            sentence = ' '.join(regex.findall(pattern,sentence))
+            # ...
+            ###### DEL wrong words
+            #sentence = ' '.join('' if word in wrong_lst else word for word in sentence.split())
+            new_sentence = new_sentence+ sentence + '. '
+        document = new_sentence
+        #print(document)
+        ###### DEL excess blank space
+        document = regex.sub(r'\s+', ' ', document).strip()
+        #...
+        return document
 
-
-# Chuẩn hóa unicode tiếng việt
 def loaddicchar():
-    uniChars = "àáảãạâầấẩẫậăằắẳẵặèéẻẽẹêềếểễệđìíỉĩịòóỏõọôồốổỗộơờớởỡợùúủũụưừứửữựỳýỷỹỵÀÁẢÃẠÂẦẤẨẪẬĂẰẮẲẴẶÈÉẺẼẸÊỀẾỂỄỆĐÌÍỈĨỊÒÓỎÕỌÔỒỐỔỖỘƠỜỚỞỠỢÙÚỦŨỤƯỪỨỬỮỰỲÝỶỸỴÂĂĐÔƠƯ"
-    unsignChars = "aaaaaaaaaaaaaaaaaeeeeeeeeeeediiiiiooooooooooooooooouuuuuuuuuuuyyyyyAAAAAAAAAAAAAAAAAEEEEEEEEEEEDIIIOOOOOOOOOOOOOOOOOOOUUUUUUUUUUUYYYYYAADOOU"
+        uniChars = "àáảãạâầấẩẫậăằắẳẵặèéẻẽẹêềếểễệđìíỉĩịòóỏõọôồốổỗộơờớởỡợùúủũụưừứửữựỳýỷỹỵÀÁẢÃẠÂẦẤẨẪẬĂẰẮẲẴẶÈÉẺẼẸÊỀẾỂỄỆĐÌÍỈĨỊÒÓỎÕỌÔỒỐỔỖỘƠỜỚỞỠỢÙÚỦŨỤƯỪỨỬỮỰỲÝỶỸỴÂĂĐÔƠƯ"
+        unsignChars = "aaaaaaaaaaaaaaaaaeeeeeeeeeeediiiiiooooooooooooooooouuuuuuuuuuuyyyyyAAAAAAAAAAAAAAAAAEEEEEEEEEEEDIIIOOOOOOOOOOOOOOOOOOOUUUUUUUUUUUYYYYYAADOOU"
 
-    dic = {}
-    char1252 = 'à|á|ả|ã|ạ|ầ|ấ|ẩ|ẫ|ậ|ằ|ắ|ẳ|ẵ|ặ|è|é|ẻ|ẽ|ẹ|ề|ế|ể|ễ|ệ|ì|í|ỉ|ĩ|ị|ò|ó|ỏ|õ|ọ|ồ|ố|ổ|ỗ|ộ|ờ|ớ|ở|ỡ|ợ|ù|ú|ủ|ũ|ụ|ừ|ứ|ử|ữ|ự|ỳ|ý|ỷ|ỹ|ỵ|À|Á|Ả|Ã|Ạ|Ầ|Ấ|Ẩ|Ẫ|Ậ|Ằ|Ắ|Ẳ|Ẵ|Ặ|È|É|Ẻ|Ẽ|Ẹ|Ề|Ế|Ể|Ễ|Ệ|Ì|Í|Ỉ|Ĩ|Ị|Ò|Ó|Ỏ|Õ|Ọ|Ồ|Ố|Ổ|Ỗ|Ộ|Ờ|Ớ|Ở|Ỡ|Ợ|Ù|Ú|Ủ|Ũ|Ụ|Ừ|Ứ|Ử|Ữ|Ự|Ỳ|Ý|Ỷ|Ỹ|Ỵ'.split(
-        '|')
-    charutf8 = "à|á|ả|ã|ạ|ầ|ấ|ẩ|ẫ|ậ|ằ|ắ|ẳ|ẵ|ặ|è|é|ẻ|ẽ|ẹ|ề|ế|ể|ễ|ệ|ì|í|ỉ|ĩ|ị|ò|ó|ỏ|õ|ọ|ồ|ố|ổ|ỗ|ộ|ờ|ớ|ở|ỡ|ợ|ù|ú|ủ|ũ|ụ|ừ|ứ|ử|ữ|ự|ỳ|ý|ỷ|ỹ|ỵ|À|Á|Ả|Ã|Ạ|Ầ|Ấ|Ẩ|Ẫ|Ậ|Ằ|Ắ|Ẳ|Ẵ|Ặ|È|É|Ẻ|Ẽ|Ẹ|Ề|Ế|Ể|Ễ|Ệ|Ì|Í|Ỉ|Ĩ|Ị|Ò|Ó|Ỏ|Õ|Ọ|Ồ|Ố|Ổ|Ỗ|Ộ|Ờ|Ớ|Ở|Ỡ|Ợ|Ù|Ú|Ủ|Ũ|Ụ|Ừ|Ứ|Ử|Ữ|Ự|Ỳ|Ý|Ỷ|Ỹ|Ỵ".split(
-        '|')
-    for i in range(len(char1252)):
-        dic[char1252[i]] = charutf8[i]
-    return dic
+        dic = {}
+        char1252 = 'à|á|ả|ã|ạ|ầ|ấ|ẩ|ẫ|ậ|ằ|ắ|ẳ|ẵ|ặ|è|é|ẻ|ẽ|ẹ|ề|ế|ể|ễ|ệ|ì|í|ỉ|ĩ|ị|ò|ó|ỏ|õ|ọ|ồ|ố|ổ|ỗ|ộ|ờ|ớ|ở|ỡ|ợ|ù|ú|ủ|ũ|ụ|ừ|ứ|ử|ữ|ự|ỳ|ý|ỷ|ỹ|ỵ|À|Á|Ả|Ã|Ạ|Ầ|Ấ|Ẩ|Ẫ|Ậ|Ằ|Ắ|Ẳ|Ẵ|Ặ|È|É|Ẻ|Ẽ|Ẹ|Ề|Ế|Ể|Ễ|Ệ|Ì|Í|Ỉ|Ĩ|Ị|Ò|Ó|Ỏ|Õ|Ọ|Ồ|Ố|Ổ|Ỗ|Ộ|Ờ|Ớ|Ở|Ỡ|Ợ|Ù|Ú|Ủ|Ũ|Ụ|Ừ|Ứ|Ử|Ữ|Ự|Ỳ|Ý|Ỷ|Ỹ|Ỵ'.split(
+            '|')
+        charutf8 = "à|á|ả|ã|ạ|ầ|ấ|ẩ|ẫ|ậ|ằ|ắ|ẳ|ẵ|ặ|è|é|ẻ|ẽ|ẹ|ề|ế|ể|ễ|ệ|ì|í|ỉ|ĩ|ị|ò|ó|ỏ|õ|ọ|ồ|ố|ổ|ỗ|ộ|ờ|ớ|ở|ỡ|ợ|ù|ú|ủ|ũ|ụ|ừ|ứ|ử|ữ|ự|ỳ|ý|ỷ|ỹ|ỵ|À|Á|Ả|Ã|Ạ|Ầ|Ấ|Ẩ|Ẫ|Ậ|Ằ|Ắ|Ẳ|Ẵ|Ặ|È|É|Ẻ|Ẽ|Ẹ|Ề|Ế|Ể|Ễ|Ệ|Ì|Í|Ỉ|Ĩ|Ị|Ò|Ó|Ỏ|Õ|Ọ|Ồ|Ố|Ổ|Ỗ|Ộ|Ờ|Ớ|Ở|Ỡ|Ợ|Ù|Ú|Ủ|Ũ|Ụ|Ừ|Ứ|Ử|Ữ|Ự|Ỳ|Ý|Ỷ|Ỹ|Ỵ".split(
+            '|')
+        for i in range(len(char1252)):
+            dic[char1252[i]] = charutf8[i]
+        return dic
+
+
 
 # Đưa toàn bộ dữ liệu qua hàm này để chuẩn hóa lại
-def convert_unicode(txt):
-    dicchar = loaddicchar()
-    return regex.sub(
-        r'à|á|ả|ã|ạ|ầ|ấ|ẩ|ẫ|ậ|ằ|ắ|ẳ|ẵ|ặ|è|é|ẻ|ẽ|ẹ|ề|ế|ể|ễ|ệ|ì|í|ỉ|ĩ|ị|ò|ó|ỏ|õ|ọ|ồ|ố|ổ|ỗ|ộ|ờ|ớ|ở|ỡ|ợ|ù|ú|ủ|ũ|ụ|ừ|ứ|ử|ữ|ự|ỳ|ý|ỷ|ỹ|ỵ|À|Á|Ả|Ã|Ạ|Ầ|Ấ|Ẩ|Ẫ|Ậ|Ằ|Ắ|Ẳ|Ẵ|Ặ|È|É|Ẻ|Ẽ|Ẹ|Ề|Ế|Ể|Ễ|Ệ|Ì|Í|Ỉ|Ĩ|Ị|Ò|Ó|Ỏ|Õ|Ọ|Ồ|Ố|Ổ|Ỗ|Ộ|Ờ|Ớ|Ở|Ỡ|Ợ|Ù|Ú|Ủ|Ũ|Ụ|Ừ|Ứ|Ử|Ữ|Ự|Ỳ|Ý|Ỷ|Ỹ|Ỵ',
-        lambda x: dicchar[x.group()], txt)
-
-
+def covert_unicode(txt):
+        dicchar = loaddicchar()
+        return regex.sub(
+            r'à|á|ả|ã|ạ|ầ|ấ|ẩ|ẫ|ậ|ằ|ắ|ẳ|ẵ|ặ|è|é|ẻ|ẽ|ẹ|ề|ế|ể|ễ|ệ|ì|í|ỉ|ĩ|ị|ò|ó|ỏ|õ|ọ|ồ|ố|ổ|ỗ|ộ|ờ|ớ|ở|ỡ|ợ|ù|ú|ủ|ũ|ụ|ừ|ứ|ử|ữ|ự|ỳ|ý|ỷ|ỹ|ỵ|À|Á|Ả|Ã|Ạ|Ầ|Ấ|Ẩ|Ẫ|Ậ|Ằ|Ắ|Ẳ|Ẵ|Ặ|È|É|Ẻ|Ẽ|Ẹ|Ề|Ế|Ể|Ễ|Ệ|Ì|Í|Ỉ|Ĩ|Ị|Ò|Ó|Ỏ|Õ|Ọ|Ồ|Ố|Ổ|Ỗ|Ộ|Ờ|Ớ|Ở|Ỡ|Ợ|Ù|Ú|Ủ|Ũ|Ụ|Ừ|Ứ|Ử|Ữ|Ự|Ỳ|Ý|Ỷ|Ỹ|Ỵ',
+            lambda x: dicchar[x.group()], txt)
+    
 
 def process_special_word(text):
-    # có thể có nhiều từ đặc biệt cần ráp lại với nhau
-    new_text = ''
-    text_lst = text.split()
-    i= 0
-    # không, chẳng, chả...
-    if 'không' in text_lst:
-        while i <= len(text_lst) - 1:
-            word = text_lst[i]
-            #print(word)
-            #print(i)
-            if  word == 'không':
-                next_idx = i+1
-                if next_idx <= len(text_lst) -1:
-                    word = word +'_'+ text_lst[next_idx]
-                i= next_idx + 1
-            else:
-                i = i+1
-            new_text = new_text + word + ' '
-    else:
-        new_text = text
-    return new_text.strip()
+        # có thể có nhiều từ đặc biệt cần ráp lại với nhau
+        new_text = ''
+        text_lst = text.split()
+        i= 0
+        # không, chẳng, chả...
+        if 'không' in text_lst:
+            while i <= len(text_lst) - 1:
+                word = text_lst[i]
+                #print(word)
+                #print(i)
+                if  word == 'không':
+                    next_idx = i+1
+                    if next_idx <= len(text_lst) -1:
+                        word = word +'_'+ text_lst[next_idx]
+                    i= next_idx + 1
+                else:
+                    i = i+1
+                new_text = new_text + word + ' '
+        else:
+            new_text = text
+        return new_text.strip()
 
 
 
 import re
 # Hàm để chuẩn hóa các từ có ký tự lặp
 def normalize_repeated_characters(text):
-    # Thay thế mọi ký tự lặp liên tiếp bằng một ký tự đó
-    # Ví dụ: "ngonnnn" thành "ngon", "thiệtttt" thành "thiệt"
-    return re.sub(r'(.)\1+', r'\1', text)
-
-# Áp dụng hàm chuẩn hóa cho văn bản
-# print(normalize_repeated_characters(example))
+        # Thay thế mọi ký tự lặp liên tiếp bằng một ký tự đó
+        # Ví dụ: "ngonnnn" thành "ngon", "thiệtttt" thành "thiệt"
+        return re.sub(r'(.)\1+', r'\1', text)
 
 
 
 def process_postag_thesea(text):
-    new_document = ''
-    for sentence in sent_tokenize(text):
-        sentence = sentence.replace('.','')
-        ###### POS tag
-        lst_word_type = ['N','Np','A','AB','V','VB','VY','R']
-        # lst_word_type = ['A','AB','V','VB','VY','R']
-        sentence = ' '.join( word[0] if word[1].upper() in lst_word_type else '' for word in pos_tag(process_special_word(word_tokenize(sentence, format="text"))))
-        new_document = new_document + sentence + ' '
-    ###### DEL excess blank space
-    new_document = regex.sub(r'\s+', ' ', new_document).strip()
-    return new_document
+        new_document = ''
+        for sentence in sent_tokenize(text):
+            sentence = sentence.replace('.','')
+            ###### POS tag
+            lst_word_type = ['N','Np','A','AB','V','VB','VY','R','M']
+            # lst_word_type = ['A','AB','V','VB','VY','R']
+            sentence = ' '.join( word[0] if word[1].upper() in lst_word_type else '' for word in pos_tag(process_special_word(word_tokenize(sentence, format="text"))))
+            new_document = new_document + sentence + ' '
+        ###### DEL excess blank space
+        new_document = regex.sub(r'\s+', ' ', new_document).strip()
+        return new_document
+
 
 
 stop_words = [
@@ -225,7 +195,18 @@ stop_words = [
    'review', 'hồi', 'bịch', 'miệng', 'dùng', 'đùi', 'tây', 'không_bị', 'tên', 'cảm_nhận', 'nhóm',
    'trả', 'gỏi', 'hơn nhiều', 'nên', 'mới được']
 
-
+def process_postag_thesea(text):
+    new_document = ''
+    for sentence in sent_tokenize(text):
+        sentence = sentence.replace('.','')
+        ###### POS tag
+        lst_word_type = ['N','Np','A','AB','V','VB','VY','R']
+        # lst_word_type = ['A','AB','V','VB','VY','R']
+        sentence = ' '.join( word[0] if word[1].upper() in lst_word_type else '' for word in pos_tag(process_special_word(word_tokenize(sentence, format="text"))))
+        new_document = new_document + sentence + ' '
+    ###### DEL excess blank space
+    new_document = regex.sub(r'\s+', ' ', new_document).strip()
+    return new_document
 
 
 def remove_stopword(text):
@@ -239,7 +220,7 @@ def remove_stopword(text):
 
 def clean_text_df(text):
   clean_text = text.apply(lambda x: process_text(x, emoji_dict, teen_dict, wrong_lst))
-  clean_text = clean_text.apply(convert_unicode)
+  clean_text = clean_text.apply(covert_unicode)
   clean_text = clean_text.apply(process_special_word)
   clean_text = clean_text.apply(normalize_repeated_characters)
   clean_text = clean_text.apply(process_postag_thesea)
@@ -247,8 +228,8 @@ def clean_text_df(text):
   return clean_text
 
 def clean_text_str(text):
-  clean_text = process_text_str(text, emoji_dict, teen_dict, wrong_lst)
-  clean_text = convert_unicode(clean_text)
+  clean_text = process_text(text, emoji_dict, teen_dict, wrong_lst,english_dict)
+  clean_text = covert_unicode(clean_text)
   clean_text = process_special_word(clean_text)
   clean_text = normalize_repeated_characters(clean_text)
   clean_text = process_postag_thesea(clean_text)
@@ -256,7 +237,7 @@ def clean_text_str(text):
   return clean_text
 
 def predict_sentiment(text):
-    return '😊' if text == 1 else '😞'  
+    return '😞' if text == 0 else '😊'  
 
 # Upload file
 data = pd.read_csv('data_sentiment.csv')
@@ -438,15 +419,15 @@ elif choice == 'Phân tích đánh giá':
                 x_new = [x_new] 
             y_pred_new = sent_model.predict(x_new)       
             st.write(y_pred_new)
-            if y_pred_new == 1:
-                st.markdown("Positive 🙂")
-            else:
+            if y_pred_new == 0:
                 st.markdown("Negative ☹️")
-        with col2:
-            if y_pred_new == 1:
-                st.image("smile.png")
             else:
+                st.markdown("Positive 🙂")
+        with col2:
+            if y_pred_new == 0:
                 st.image("sad.png")
+            else:
+                st.image("smile.png")
 
     st.subheader('Tải tệp')
     with st.form(key='dfform'):
